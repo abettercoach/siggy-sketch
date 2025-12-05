@@ -1,0 +1,16 @@
+{
+  "$schema": "https://rcade.dev/manifest.schema.json",
+  "name": "siggy-sketch",
+  "display_name": "Siggy Sketch",
+  "description": "Etch A Sketch @ RCade",
+  "visibility": "public",
+  "authors": {
+    "display_name": "Iris & Victoria & Anjana"
+  },
+  "dependencies": [
+    {
+      "name": "@rcade/input-classic",
+      "version": "1.0.0"
+    }
+  ]
+}
