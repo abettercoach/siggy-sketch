@@ -45,6 +45,7 @@ const KNOB_CENTER_RIGHT = {
 const sketch = (p: p5) => {
     let x: number;
     let y: number;
+    let game_started = false;
 
     let shaking = false;
 
@@ -129,6 +130,7 @@ const sketch = (p: p5) => {
 
 
     p.draw = () => {
+
         // Handle shaking
         if (shaking) {
             p.fill(SCREEN_COLOR, SCREEN_COLOR, SCREEN_COLOR, 30);
@@ -152,6 +154,16 @@ const sketch = (p: p5) => {
         p.ellipse(x, y, BALL_SIZE, BALL_SIZE);
         draw_frame();
         draw_knobs();
+
+
+        if (!game_started) {
+            p.textAlign(p.CENTER);
+            p.textSize(20);
+            p.fill(PEN_COLOR);
+            p.text("SHAKE JOYSTICKS", WIDTH / 2, HEIGHT / 2 - 10);
+            p.text("TO CLEAR SCREEN", WIDTH / 2, HEIGHT / 2 + 10);
+            game_started = true;
+        }
     };
 };
 
