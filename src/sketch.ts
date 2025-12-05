@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { PLAYER_1, SYSTEM, on } from "@rcade/plugin-input-classic";
+import { on } from "@rcade/plugin-input-classic";
 import { PLAYER_1 as SPINNER_1, PLAYER_2 as SPINNER_2 } from "@rcade/plugin-input-spinners";
 
 // Rcade game dimensions
@@ -27,19 +27,18 @@ const KNOB_MARGIN = 5
 const sketch = (p: p5) => {
     let x: number;
     let y: number;
-    const speed = 4;
     const ballSize = 2;
 
     let shaking = false;
 
     function draw_knobs() {
-        p.push()
-        p.fill("white")
-        p.stroke(SCREEN_COLOR)
-        p.strokeWeight(2)
-        p.circle(BORDER_WIDTH / 2 + KNOB_MARGIN, HEIGHT - BORDER_WIDTH / 2 - KNOB_MARGIN, KNOB_RADIUS)
-        p.circle(WIDTH - BORDER_WIDTH / 2 - KNOB_MARGIN, HEIGHT - BORDER_WIDTH / 2 - KNOB_MARGIN, KNOB_RADIUS)
-
+        p.push();
+        p.fill("white");
+        p.stroke(SCREEN_COLOR);
+        p.strokeWeight(2);
+        p.circle(BORDER_WIDTH / 2 + KNOB_MARGIN, HEIGHT - BORDER_WIDTH / 2 - KNOB_MARGIN, KNOB_RADIUS);
+        p.circle(WIDTH - BORDER_WIDTH / 2 - KNOB_MARGIN, HEIGHT - BORDER_WIDTH / 2 - KNOB_MARGIN, KNOB_RADIUS);
+        p.pop();
     }
     function draw_frame() {
         p.push()
@@ -60,12 +59,12 @@ const sketch = (p: p5) => {
         // p.noStroke();
 
         p.rect(BORDER_WIDTH, BORDER_WIDTH, INNER_WIDTH, INNER_HEIGHT, BORDER_RADIUS);
-        draw_frame()
-        on("press", (data) => {
+        draw_frame();
+        on("press", () => {
             shake();
         });
 
-        draw_knobs()
+        draw_knobs();
     };
 
     function shake() {
@@ -95,7 +94,7 @@ const sketch = (p: p5) => {
         p.fill(PEN_COLOR);
         p.noStroke();
         p.ellipse(x, y, ballSize, ballSize);
-        draw_frame()
+        draw_frame();
 
     };
 };
