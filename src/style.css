@@ -17,3 +17,33 @@ main {
 canvas {
     display: block;
 }
+
+.sketch-logo {
+    font-family: 'Rondo', serif;
+    z-index: 100;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: #d8ba77;
+}
+
+.sketch-logo::before, .sketch-logo::after {
+    font-family: sans-serif;
+    font-size: x-small;
+    font-style: italic;
+    padding: 0px 10px; 
+}
+
+.sketch-logo::before{
+    content: "MAGIC";
+}
+
+.sketch-logo::after {
+    content: "SCREEN";
+}
+
+
+@font-face {
+    font-family: Rondo;
+    src: url("../assets/OPTIRondo-Bold.otf") format("opentype");
+}
