@@ -27,7 +27,8 @@ const INNER_HEIGHT = HEIGHT - BORDER_WIDTH * 2;
 const MIN_X = BORDER_WIDTH + BALL_SIZE;
 const MAX_X = INNER_WIDTH - BALL_SIZE / 2 + BORDER_WIDTH;
 const MIN_Y = BORDER_WIDTH + BALL_SIZE;
-const MAX_Y = INNER_HEIGHT - BALL_SIZE / 2 + BORDER_WIDTH;
+//@ts-ignore
+const MAX_Y = INNER_HEIGHT - BALL_SIZE / 2 + BORDER_WIDTH; 
 
 
 //circle 
@@ -69,8 +70,6 @@ const sketch = (p: p5) => {
     }
 
     function draw_notches(knob_center: { x: number, y: number }, notch_angle: number) {
-
-
 
         p.push();
         p.translate(knob_center.x, knob_center.y);
