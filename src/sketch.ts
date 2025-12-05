@@ -137,24 +137,37 @@ const sketch = (p: p5) => {
         }
         shaking = false;
 
+        const last_x = x;
+        const last_y = y;
+
         // Handle input from arcade controls
         const stepsX = SPINNER_1.SPINNER.step_delta;
-        x += stepsX;
+        x = last_x + stepsX * 0.7;
 
         const stepsY = SPINNER_2.SPINNER.step_delta;
-        y -= stepsY;
+        y = last_y - stepsY * 0.7;
 
         // Keep ball in bounds
         x = p.constrain(x, MIN_X, MAX_X);
         y = p.constrain(y, BORDER_WIDTH + BALL_SIZE / 2, INNER_HEIGHT - BALL_SIZE / 2 + BORDER_WIDTH);
 
-        p.fill(PEN_COLOR);
-        p.noStroke();
-        p.ellipse(x, y, BALL_SIZE, BALL_SIZE);
+        if (stepsX !== 0 || stepsY !== 0) {
+            p.fill(PEN_COLOR);
+            p.stroke(SCREEN_COLOR);
+            p.strokeWeight(2);
+            p.ellipse(x, y, BALL_SIZE, BALL_SIZE);
+
+            p.fill(PEN_COLOR);
+            p.stroke(PEN_COLOR);
+            p.strokeWeight(1);
+            p.ellipse(last_x, last_y, BALL_SIZE, BALL_SIZE);
+
+        }
+
         draw_frame();
         draw_knobs();
 
-
+        p.noStroke();
         if (!game_started) {
             p.textAlign(p.CENTER);
             p.textSize(20);
