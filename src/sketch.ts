@@ -1,6 +1,7 @@
 import p5 from "p5";
 import { PLAYER_1, PLAYER_2, on } from "@rcade/plugin-input-classic";
 import { PLAYER_1 as SPINNER_1, PLAYER_2 as SPINNER_2 } from "@rcade/plugin-input-spinners";
+import EASTRIAL from "../assets/EASTRIAL.otf";
 
 // Rcade game dimensions
 const WIDTH = 336;
@@ -51,6 +52,8 @@ const sketch = (p: p5) => {
     // Screen Buffer
     let screen_canvas: p5.Graphics;
 
+    // Font
+    let font: p5.Font;
 
     // Tilting
     let shaking = false;
@@ -141,6 +144,10 @@ const sketch = (p: p5) => {
         c.pop();
     }
 
+    p.preload = () => {
+        font = p.loadFont(EASTRIAL);
+    }
+
     p.setup = () => {
         p.createCanvas(WIDTH, HEIGHT, p.WEBGL);
         x = WIDTH / 2;
@@ -148,6 +155,7 @@ const sketch = (p: p5) => {
 
         screen_canvas = p.createGraphics(WIDTH, HEIGHT, p.WEBGL);
         screen_canvas.translate(-WIDTH/2,-HEIGHT/2, 5);
+        screen_canvas.textFont(font);
 
         // p.push();
         // p.rotateY(Math.PI / 10);
@@ -258,23 +266,27 @@ const sketch = (p: p5) => {
         c.ellipse(last_x, last_y, BALL_SIZE, BALL_SIZE);
         c.pop();
 
-        p.push();
+        // Start Instructions
+        c.push();
+        c.translate(0,0,5);
+        c.noStroke();
+        if (!game_started) {
+            c.textAlign(p.CENTER);
+            c.textSize(30);
+            c.fill(PEN_COLOR);
+            c.text("SHAKE JOYSTICKS", WIDTH / 2, HEIGHT / 2 - 15);
+            c.text("TO CLEAR SCREEN", WIDTH / 2, HEIGHT / 2 + 15);
+            game_started = true;
+        }
+        c.pop();
+
         p.image(c, BORDER_WIDTH, BORDER_WIDTH, INNER_WIDTH, INNER_HEIGHT);
-        p.pop();
 
         draw_frame();
         draw_knobs();
 
-        p.noStroke();
-        if (!game_started) {
-            p.textAlign(p.CENTER);
-            p.textSize(20);
-            p.fill(PEN_COLOR);
-            p.text("SHAKE JOYSTICKS", WIDTH / 2, HEIGHT / 2 - 10);
-            p.text("TO CLEAR SCREEN", WIDTH / 2, HEIGHT / 2 + 10);
-            game_started = true;
-        }
         p.pop();
+
     };
 };
 
