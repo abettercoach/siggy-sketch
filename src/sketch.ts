@@ -2,6 +2,9 @@ import p5 from "p5";
 import { PLAYER_1, PLAYER_2, on } from "@rcade/plugin-input-classic";
 import { PLAYER_1 as SPINNER_1, PLAYER_2 as SPINNER_2 } from "@rcade/plugin-input-spinners";
 import EASTRIAL from "../assets/EASTRIAL.otf";
+import RONDO from "../assets/OPTIRondo-Bold.otf";
+import SANS_SERIF from "../assets/Helvetica-Oblique.ttf";
+import RC_LOGO from "../assets/recurse.svg";
 
 // Rcade game dimensions
 const WIDTH = 336;
@@ -10,7 +13,6 @@ const BORDER_WIDTH = 35
 const BORDER_RADIUS = 10
 
 const BALL_SIZE = 2;
-
 
 const SCREEN_COLOR = 219;
 const FRAME_COLOR = [200, 1, 1];
@@ -52,8 +54,11 @@ const sketch = (p: p5) => {
     // Screen Buffer
     let screen_canvas: p5.Graphics;
 
-    // Font
-    let font: p5.Font;
+    // Assets
+    let instruction_font: p5.Font;
+    let logo_font_main: p5.Font;
+    let logo_font_sub: p5.Font;
+    let logo_image: p5.Image;
 
     // Tilting
     let shaking = false;
@@ -122,7 +127,29 @@ const sketch = (p: p5) => {
 
         p.strokeWeight(5)
         p.rect(BORDER_WIDTH - 2, BORDER_WIDTH - 2, INNER_WIDTH + 2 * 2, INNER_HEIGHT + 2 * 2, BORDER_RADIUS);
-        p.pop()
+
+        // Logo Image
+        p.translate(0,0,10);
+        p.image(logo_image, BORDER_WIDTH - 18, 10, 15, 19);
+
+        // Logo Text
+        p.textAlign(p.CENTER);
+        p.textSize(16);
+        p.fill(216, 186, 119);
+
+        p.textFont(logo_font_main);
+        p.text("Siggy Sketch", WIDTH / 2, 28);
+
+        p.textFont(logo_font_sub);
+        p.textSize(10);
+        p.text("MAGIC", WIDTH / 2 - 85, 28);
+        p.text("SCREEN", WIDTH / 2 + 85, 28);
+
+        p.textSize(8);
+        p.text("©", 38, 28);
+        
+
+        p.pop();
 
         // Back of frame
         p.push();
@@ -145,7 +172,10 @@ const sketch = (p: p5) => {
     }
 
     p.preload = () => {
-        font = p.loadFont(EASTRIAL);
+        instruction_font = p.loadFont(EASTRIAL);
+        logo_font_main = p.loadFont(RONDO);
+        logo_font_sub = p.loadFont(SANS_SERIF);
+        logo_image = p.loadImage(RC_LOGO);
     }
 
     p.setup = () => {
@@ -155,7 +185,7 @@ const sketch = (p: p5) => {
 
         screen_canvas = p.createGraphics(WIDTH, HEIGHT, p.WEBGL);
         screen_canvas.translate(-WIDTH/2,-HEIGHT/2, 5);
-        screen_canvas.textFont(font);
+        screen_canvas.textFont(instruction_font);
 
         // p.push();
         // p.rotateY(Math.PI / 10);
