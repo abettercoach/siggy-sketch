@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { on } from "@rcade/plugin-input-classic";
+import { PLAYER_1, PLAYER_2, on } from "@rcade/plugin-input-classic";
 import { PLAYER_1 as SPINNER_1, PLAYER_2 as SPINNER_2 } from "@rcade/plugin-input-spinners";
 
 // Rcade game dimensions
@@ -18,7 +18,7 @@ const NOTCH_COLOR = 130;
 const KNOB_N_NOTCHES = 20;
 
 // A red line
-const STROKE_WEIGHT = 5;
+const STROKE_WEIGHT = BORDER_WIDTH;
 const OFFSET = STROKE_WEIGHT / 2;
 
 const INNER_WIDTH = WIDTH - BORDER_WIDTH * 2;
@@ -31,7 +31,7 @@ const MIN_Y = BORDER_WIDTH + BALL_SIZE;
 const MAX_Y = INNER_HEIGHT - BALL_SIZE / 2 + BORDER_WIDTH; 
 
 
-//circle 
+// Circle 
 const KNOB_DIAMETER = 30
 const KNOB_MARGIN = 5
 const KNOB_CENTER_LEFT = {
@@ -48,10 +48,20 @@ const sketch = (p: p5) => {
     let y: number;
     let game_started = false;
 
+    // Screen Buffer
+    let screen_canvas: p5.Graphics;
+
+
+    // Tilting
     let shaking = false;
+    let tilt_state = {
+        x: 0,
+        y: 0,
+    };
 
     function draw_knobs() {
         p.push();
+        p.translate(0,0,25);
         p.fill("white");
         p.stroke(SCREEN_COLOR);
         p.strokeWeight(2);
@@ -73,6 +83,7 @@ const sketch = (p: p5) => {
     function draw_notches(knob_center: { x: number, y: number }, notch_angle: number) {
 
         p.push();
+        p.translate(0,0,25);
         p.translate(knob_center.x, knob_center.y);
         p.rotate(notch_angle);
         p.stroke(NOTCH_COLOR);
@@ -99,28 +110,77 @@ const sketch = (p: p5) => {
 
     function draw_frame() {
         p.push()
+        p.translate(0,0,5);
         p.noFill()
         p.stroke(FRAME_COLOR)
+        
         p.strokeWeight(STROKE_WEIGHT)
         p.rect(BORDER_WIDTH - OFFSET, BORDER_WIDTH - OFFSET, INNER_WIDTH + OFFSET * 2, INNER_HEIGHT + OFFSET * 2, BORDER_RADIUS);
+
+        p.strokeWeight(5)
+        p.rect(BORDER_WIDTH - 2, BORDER_WIDTH - 2, INNER_WIDTH + 2 * 2, INNER_HEIGHT + 2 * 2, BORDER_RADIUS);
         p.pop()
+
+        // Back of frame
+        p.push();
+        p.fill(FRAME_COLOR);
+        p.noStroke();
+        p.translate(0,0,-5);
+        p.rect(BORDER_WIDTH - 5, BORDER_WIDTH - 5, INNER_WIDTH + 10, INNER_HEIGHT + 10, BORDER_RADIUS / 2);
+        p.pop();
     }
+
+    function draw_screen() {
+        const c = screen_canvas;
+        c.push()
+        c.fill(SCREEN_COLOR);
+        c.translate(0,0,1);
+        c.stroke(SCREEN_COLOR);
+        c.strokeWeight(1);
+        c.rect(0, 0, WIDTH, HEIGHT, BORDER_RADIUS / 2);
+        c.pop();
+    }
+
     p.setup = () => {
-        p.createCanvas(WIDTH, HEIGHT);
+        p.createCanvas(WIDTH, HEIGHT, p.WEBGL);
         x = WIDTH / 2;
         y = HEIGHT / 2;
 
+        screen_canvas = p.createGraphics(WIDTH, HEIGHT, p.WEBGL);
+        screen_canvas.translate(-WIDTH/2,-HEIGHT/2, 5);
 
-        p.background(FRAME_COLOR);
-        p.fill(SCREEN_COLOR);
+        // p.push();
+        // p.rotateY(Math.PI / 10);
+        // p.translate(-WIDTH/2,-HEIGHT/2);
+        
+        // p.fill(SCREEN_COLOR);
+        // p.rect(BORDER_WIDTH, BORDER_WIDTH, INNER_WIDTH, INNER_HEIGHT, BORDER_RADIUS);
 
-        p.rect(BORDER_WIDTH, BORDER_WIDTH, INNER_WIDTH, INNER_HEIGHT, BORDER_RADIUS);
-        draw_frame();
-        on("press", () => {
+        // draw_frame();
+        // draw_knobs();
+        // p.pop()
+
+
+        on("press", (event) => {
+            if (event.button === "LEFT") {
+                tilt_state.y -= Math.PI * 0.1;
+            }
+
+            if (event.button === "RIGHT") {
+                tilt_state.y += Math.PI * 0.1;
+            }
+
+            if (event.button === "UP") {
+                tilt_state.x += Math.PI * 0.1;
+            }
+
+            if (event.button === "DOWN") {
+                tilt_state.x -= Math.PI * 0.1;
+            }
+
             shake();
         });
 
-        draw_knobs();
     };
 
     function shake() {
@@ -130,13 +190,43 @@ const sketch = (p: p5) => {
 
     p.draw = () => {
 
+        // Reset Tilt
+        // if (!PLAYER_1.DPAD.down && !PLAYER_1.DPAD.up && !PLAYER_1.DPAD.left && !PLAYER_1.DPAD.right &&
+        //     !PLAYER_2.DPAD.down && !PLAYER_2.DPAD.up && !PLAYER_2.DPAD.left && !PLAYER_2.DPAD.right ) {
+        //         tilt_state = { x: 0, y: 0 };
+        // }
+
+        if (!PLAYER_1.DPAD.up && !PLAYER_2.DPAD.up && !PLAYER_1.DPAD.down && !PLAYER_2.DPAD.down) {
+                tilt_state.x = 0;
+        }
+
+        if (!PLAYER_1.DPAD.left && !PLAYER_2.DPAD.left && !PLAYER_1.DPAD.right && !PLAYER_2.DPAD.right) {
+                tilt_state.y = 0;
+        }
+
+        p.clear();
+        p.push();
+        p.rotateY(tilt_state.y);
+        p.rotateX(tilt_state.x);
+        p.translate(-WIDTH/2,-HEIGHT/2);
+
         // Handle shaking
         if (shaking) {
-            p.fill(SCREEN_COLOR, SCREEN_COLOR, SCREEN_COLOR, 30);
-            p.rect(BORDER_WIDTH, BORDER_WIDTH, INNER_WIDTH, INNER_HEIGHT, BORDER_RADIUS);
+            const c = screen_canvas;
+            c.push()
+            c.fill(SCREEN_COLOR, SCREEN_COLOR, SCREEN_COLOR, 30);
+            c.translate(0,0,5);
+            c.stroke(SCREEN_COLOR);
+            c.strokeWeight(1);
+            c.rect(0, 0, WIDTH, HEIGHT, BORDER_RADIUS / 2);
+            c.pop();
         }
         shaking = false;
 
+        //Draw Screen
+        draw_screen()
+
+        //Calculate pen position
         const last_x = x;
         const last_y = y;
 
@@ -147,22 +237,30 @@ const sketch = (p: p5) => {
         const stepsY = SPINNER_2.SPINNER.step_delta;
         y = last_y - stepsY * 0.7;
 
-        // Keep ball in bounds
+        // Keep pen in bounds
         x = p.constrain(x, MIN_X, MAX_X);
         y = p.constrain(y, BORDER_WIDTH + BALL_SIZE / 2, INNER_HEIGHT - BALL_SIZE / 2 + BORDER_WIDTH);
 
+        // Draw pen
+        const c = screen_canvas;
+        c.push();
+        c.translate(0,0,5);
         if (stepsX !== 0 || stepsY !== 0) {
-            p.fill(PEN_COLOR);
-            p.stroke(SCREEN_COLOR);
-            p.strokeWeight(2);
-            p.ellipse(x, y, BALL_SIZE, BALL_SIZE);
-
-            p.fill(PEN_COLOR);
-            p.stroke(PEN_COLOR);
-            p.strokeWeight(1);
-            p.ellipse(last_x, last_y, BALL_SIZE, BALL_SIZE);
-
+            c.fill(PEN_COLOR);
+            c.stroke(SCREEN_COLOR);
+            c.strokeWeight(2);
+            c.ellipse(x, y, BALL_SIZE, BALL_SIZE);
         }
+
+        c.fill(PEN_COLOR);
+        c.stroke(PEN_COLOR);
+        c.strokeWeight(1);
+        c.ellipse(last_x, last_y, BALL_SIZE, BALL_SIZE);
+        c.pop();
+
+        p.push();
+        p.image(c, BORDER_WIDTH, BORDER_WIDTH, INNER_WIDTH, INNER_HEIGHT);
+        p.pop();
 
         draw_frame();
         draw_knobs();
@@ -176,6 +274,7 @@ const sketch = (p: p5) => {
             p.text("TO CLEAR SCREEN", WIDTH / 2, HEIGHT / 2 + 10);
             game_started = true;
         }
+        p.pop();
     };
 };
 
